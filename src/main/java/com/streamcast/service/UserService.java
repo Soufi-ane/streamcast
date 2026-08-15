@@ -42,4 +42,27 @@ public class UserService {
     return ResponseEntity.status(HttpStatus.CREATED).body(new UserResponse(userRepo.save(user)));
   }
 
+  public ResponseEntity<?> login(LoginRequest request, HttpServletResponse response){
+    Optional<User> optUser = userRepo.findByEmail(request.email());
+    if(!optUser.isPresent()){
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid username or password");
+    } 
+    User user = optUser.get();
+    if(!passwordEncoder.matches(request.password(), user.getPassword())){
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid username or password");
+    }
+
+    String token = jwtService.generateToken(user.getEmail(), user.getId());
+    ResponseCookie cookie = ResponseCookie.from("jwt",token)
+      .httpOnly(true)
+      .secure(false) // dev
+      .path("/")
+      .maxAge(Duration.ofDays(1))
+      .sameSite("Strict")
+      .build();
+
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    
+    return ResponseEntity.ok(new UserResponse(user));
+  }
 }
