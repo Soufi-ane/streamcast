@@ -32,6 +32,12 @@ public class UserController {
     return userService.register(request);
   }
 
+  @GetMapping("/auth")
+  public ResponseEntity<?> authenticate(@AuthenticationPrincipal UserDetails userDetails){
+    if(userDetails == null) return ResponseEntity.status(401).build();
+    return ResponseEntity.ok(new UserResponse((User) userDetails));
+  }
+
   @PostMapping("/login")
   public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response){
     return userService.login(request,response);
