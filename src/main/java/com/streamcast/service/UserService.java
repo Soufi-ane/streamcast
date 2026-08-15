@@ -65,4 +65,18 @@ public class UserService {
     
     return ResponseEntity.ok(new UserResponse(user));
   }
+
+  public ResponseEntity<?> logout(HttpServletResponse response) {
+    ResponseCookie cookie = ResponseCookie.from("jwt","")
+      .httpOnly(true)
+      .secure(false) // dev
+      .path("/")
+      .maxAge(0)
+      .sameSite("Strict")
+      .build();
+    
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    return ResponseEntity.ok().body("Logged out successfully");
+  }
+
 }
