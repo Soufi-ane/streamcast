@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.streamcast.entity.Schemas.RegisterRequest;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,6 +27,12 @@ public class User implements UserDetails {
   private String name;
   private String email;
   private String password;
+
+  public User(RegisterRequest request, String password){
+    this.name = request.name();
+    this.email = request.email();
+    this.password = password;
+  }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
