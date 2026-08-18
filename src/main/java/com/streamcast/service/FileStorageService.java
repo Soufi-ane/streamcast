@@ -30,4 +30,20 @@ public class FileStorageService {
     }
   }
 
+  public String storeFile(MultipartFile file){
+    try {
+      String ogFileName = file.getOriginalFilename();
+      String extension = "";
+      if(ogFileName != null && ogFileName.contains(".")){
+        extension = ogFileName.substring(ogFileName.lastIndexOf("."));
+      }
+      String uniqueFileName = UUID.randomUUID().toString() + extension;
+      Path saveLocation = uploadPath.resolve(uniqueFileName);
+      Files.copy(file.getInputStream(), saveLocation, StandardCopyOption.REPLACE_EXISTING);
+      return uniqueFileName;
+    }catch (IOException ex) {
+      throw new RuntimeException("Coudn't save file\n", ex);
+    }
+  }
+
 }
