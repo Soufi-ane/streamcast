@@ -35,4 +35,21 @@ public class VideoService {
     return ResponseEntity.ok("Video uploaded successfully '" + file.getOriginalFilename() + "'");
   }
 
+  public ResponseEntity<?> streamVideo(String id){
+    Optional<VideoData> optData = videoRepo.findById(id);
+    if(optData.isPresent()){
+      VideoData data = optData.get();
+      try {
+        Resource vidResource = fileService.loadFileResource(data.getDbName());
+        return ResponseEntity.ok()
+          .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + data.getOgName())
+          .contentType(MediaType.parseMediaType("video/mp4"))
+          .body(vidResource);
+      }catch (Exception ex){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex);
+      }
+    }else {
+      return ResponseEntity.notFound().build();
+    }
+  }
 }
