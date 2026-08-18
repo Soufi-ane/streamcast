@@ -23,6 +23,11 @@ public class VideoController {
     this.videoService = videoService;
   }
 
+  @GetMapping("stream/{id}")
+  public ResponseEntity<?> streamVideo(@PathVariable String id){
+    return videoService.streamVideo(id);
+  }
+
   @PostMapping("upload")
   public ResponseEntity<?> uploadViedo(@RequestParam("file") MultipartFile file){
     if(file.isEmpty()){
