@@ -46,4 +46,18 @@ public class FileStorageService {
     }
   }
 
+  public Resource loadFileResource(String fileName){
+    try {
+      Path filePath = uploadPath.resolve(fileName).normalize();
+      Resource resource = new UrlResource(filePath.toUri());
+      if(resource.exists() && resource.isReadable()){
+        return resource;
+      }else {
+        throw new RuntimeException("File not found or doesn't have read permission\n");
+      }
+    }catch(IOException ex){
+      throw new RuntimeException("Coudn't read file\n", ex);
+    }
+  }
+
 }
