@@ -1,11 +1,15 @@
 package com.streamcast.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.support.ResourceRegion;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRange;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,9 +27,19 @@ public class VideoController {
     this.videoService = videoService;
   }
 
+  @GetMapping("list")
+  public ResponseEntity<?> listVideos(){
+    return videoService.list();
+  }
+
   @GetMapping("stream/{id}")
-  public ResponseEntity<?> streamVideo(@PathVariable String id){
-    return videoService.streamVideo(id);
+  public ResponseEntity<ResourceRegion> streamVideo(
+    @PathVariable String id,
+    @RequestHeader(value = "Range", required = false) HttpHeaders headers
+  ){
+    HttpRange range = (headers != null && !headers.getRange().isEmpty())
+      ? headers.getRange().get(0) : null;
+    return videoService.streamVideo(id, range);
   }
 
   @PostMapping("upload")
@@ -40,6 +54,4 @@ public class VideoController {
     }
     return videoService.upload(file);
   }
-
 }
-
